@@ -1,0 +1,40 @@
+﻿@using proje1.Models;
+
+@{
+    Layout = null;
+    var data = (List<Vehicle>)ViewData["data"];
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link rel="stylesheet" href="~/Content/map.css">
+</head>
+<body>
+    <div class="header">
+        <img src="logo.png" alt="">
+    </div>
+    <div class="container">
+        <div id="map"></div>
+        <div class="list-container">
+            @data[0].CusID
+            @data[0].VehicleID
+        </div>
+    </div>
+
+    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap&v=weekly" async></script>
+    <script>
+        let map;
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: -34.397, lng: 150.644 },
+                zoom: 8,
+            });
+        };
+    </script>
+</body>
+</html>

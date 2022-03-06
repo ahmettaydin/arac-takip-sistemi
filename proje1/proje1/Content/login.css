@@ -37,14 +37,14 @@
     outline: none;
     border: none;
     margin-top: 2em;
-    background-color: yellow;
+    background-color: #a3c9a6;
     border-radius: 6px;
     text-transform: capitalize;
     font-size: medium;
     font-weight: bold;
 }
 .form-control input[type="submit"]:hover{
-    background-color: rgb(255, 255, 112);
+    background-color: #cadebd;
     color: #fff;
 }
 h1{

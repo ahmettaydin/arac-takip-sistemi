@@ -12,6 +12,8 @@ namespace proje1.Controllers
     {
         SqlConnection connection = new SqlConnection("Data Source=DESKTOP-JU7J8P7;Initial Catalog=Taxi;Integrated Security=True");
         List<Customer> customers = new List<Customer>();
+        Customer customer = null;
+        DateTime now;
 
         // GET: Login
         public ActionResult Index()
@@ -40,8 +42,20 @@ namespace proje1.Controllers
             {
                 if(u.Suspended != 1)
                 {
-                    Customer customer = new Customer(u.CusID, u.CusName, u.CusLastName, u.CusEmail, u.CusPassword, u.Suspended, u.Incorrect);
-                    return RedirectToAction("Index", "Home");
+                    now = DateTime.Now;
+                    customer = new Customer(u.CusID, u.CusName, u.CusLastName, u.CusEmail, u.CusPassword, u.Suspended, u.Incorrect);
+                    InsertLogin(customer.CusID, now);
+                    string url =
+                        string.Format("/home/index?cusID={0}" +
+                        "&cusName={1}" +
+                        "&cusLastName={2}" +
+                        "&cusEmail={3}" +
+                        "&cusPsw={4}" +
+                        "&suspended={5}" +
+                        "&incorrect={6}" +
+                        "&visitingID={7}",
+                        u.CusID,u.CusName,u.CusLastName,u.CusEmail,u.CusPassword,u.Suspended,u.Incorrect,GetVisitingID());
+                    return Redirect(url);
                 }
                 else
                 {
@@ -100,6 +114,32 @@ namespace proje1.Controllers
             cmd.Parameters.AddWithValue("email", email);
             cmd.ExecuteNonQuery();
             connection.Close();
+        }
+
+        private void InsertLogin(int cusID, DateTime now)
+        {
+            connection.Open();
+            string sql = "INSERT INTO VisitingTime (cusID, login) VALUES (@cusID, @now)";
+            SqlCommand cmd = new SqlCommand(sql, connection);
+            cmd.Parameters.AddWithValue("cusID", cusID);
+            cmd.Parameters.AddWithValue("now", now);
+            cmd.ExecuteNonQuery();
+            connection.Close();
+        }
+
+        private int GetVisitingID()
+        {
+            connection.Open();
+            string sql = "SELECT MAX(visitingID) FROM VisitingTime";
+            SqlCommand cmd = new SqlCommand(sql, connection);
+            SqlDataReader reader = cmd.ExecuteReader();
+            int visitingID = -1;
+            while(reader.Read())
+            {
+                visitingID = Convert.ToInt32(reader[0]);
+            }
+            connection.Close();
+            return visitingID;
         }
     }
 }

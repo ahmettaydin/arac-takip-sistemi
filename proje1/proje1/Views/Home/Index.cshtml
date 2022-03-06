@@ -2,7 +2,8 @@
 
 @{
     Layout = null;
-    var data = (List<Vehicle>)ViewData["data"];
+    var customer = (Customer)ViewData["customer"];
+    var vehicles = (List<Vehicle>)ViewData["vehicles"];
 }
 
 <!DOCTYPE html>
@@ -12,21 +13,6 @@
     <meta name="viewport" content="width=device-width" />
     <title>Index</title>
     <link rel="stylesheet" href="~/Content/map.css">
-</head>
-<body>
-    <div class="header">
-        <img src="logo.png" alt="">
-    </div>
-    <div class="container">
-        <div id="map"></div>
-        <div class="list-container">
-            @data[0].CusID
-            @data[0].VehicleID
-        </div>
-    </div>
-
-    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap&v=weekly" async></script>
     <script>
         let map;
         function initMap() {
@@ -36,5 +22,57 @@
             });
         };
     </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <img src="~/Content/images/logo.png" alt="">
+            </div>
+            <div class="menu">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">About</a></li>
+                </ul>
+            </div>
+            <div class="cus-icon">
+                <img src="~/Content/images/icon.png" alt="">
+            </div>
+            <div class="cus-info">
+                <a href="#">@customer.CusName @customer.CusLastName</a>
+                <ul>
+                    <li>
+                        <a href="/Home/Logout">Sign out</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="body">
+            <div id="map"></div>
+            <div class="list-container">
+                <h2>Your Vehicles</h2>
+                <div class="list-element">
+                    <div class="row">
+                        Vehicle ID: @vehicles[0].VehicleID
+                    </div>
+                    <button type="button" id="btn1">Preview</button>
+                </div>
+                <div class="list-element">
+                    <div class="row">
+                        Vehicle ID: @vehicles[1].VehicleID
+                    </div>
+                    <button type="button" id="btn2">Preview</button>
+                </div>
+            </div>
+        </div>
+        <div class="nebu">
+            190202081@kocaeli.edu.tr |
+            190202081@kocaeli.edu.tr
+        </div>
+    </div>
+
+    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap&v=weekly" async></script>
 </body>
 </html>

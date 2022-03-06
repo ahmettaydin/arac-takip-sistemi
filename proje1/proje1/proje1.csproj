@@ -88,6 +88,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\images\icon.png" />
+    <Content Include="Content\images\logo.png" />
     <Content Include="Content\login.css" />
     <Content Include="Content\map.css" />
     <Content Include="Global.asax" />

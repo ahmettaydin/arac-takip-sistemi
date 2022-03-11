@@ -1,4 +1,7 @@
-﻿using proje1.Models;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using proje1.Database;
+using proje1.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -10,9 +13,18 @@ namespace proje1.Controllers
 {
     public class HomeController : Controller
     {
-        SqlConnection connection = new SqlConnection("Data Source=DESKTOP-JU7J8P7;Initial Catalog=Taxi;Integrated Security=True");
-        List<Vehicle> vehicles = new List<Vehicle>();
-        Customer customer;
+        private SqlConnection connection = new SqlConnection("Data Source=DESKTOP-JU7J8P7;Initial Catalog=Taxi;Integrated Security=True");
+        private List<CustomerVehicles> cusVehicles;
+        private Customer customer;
+
+        private MongoDBContext dBContext;
+        private IMongoCollection<Vehicle> mongoCollection;
+
+        public HomeController()
+        {
+            dBContext = new MongoDBContext();
+            mongoCollection = dBContext.database.GetCollection<Vehicle>("Vehicles");
+        }
 
         // GET: Home
         public ActionResult Index()
@@ -25,12 +37,14 @@ namespace proje1.Controllers
                 Request.QueryString["cusPsw"],
                 int.Parse(Request.QueryString["suspended"]),
                 int.Parse(Request.QueryString["incorrect"]));
+            cusVehicles = GetCustomerVehicles(customer.CusID);
+            var vehicle1 = mongoCollection.Find(x => x.ID == cusVehicles[0].VehicleID).ToList();
+            var vehicle2 = mongoCollection.Find(x => x.ID == cusVehicles[1].VehicleID).ToList();
             int visitingID = int.Parse(Request.QueryString["visitingID"]);
             TempData["visitingID"] = visitingID;
-            vehicles.Add(new Vehicle(1, 1));
-            vehicles.Add(new Vehicle(2, 1));
             ViewData["customer"] = customer;
-            ViewData["vehicles"] = vehicles;
+            ViewData["vehicle1"] = vehicle1;
+            ViewData["vehicle2"] = vehicle2;
             return View();
         }
 
@@ -50,6 +64,22 @@ namespace proje1.Controllers
             cmd.Parameters.AddWithValue("visitingID", visitingID);
             cmd.ExecuteNonQuery();
             connection.Close();
+        }
+
+        private List<CustomerVehicles> GetCustomerVehicles(int cusID)
+        {
+            List<CustomerVehicles> customerVehicles = new List<CustomerVehicles>();
+            connection.Open();
+            string sql = "SELECT * FROM Vehicle WHERE cusID = @cusID";
+            SqlCommand cmd = new SqlCommand(sql, connection);
+            cmd.Parameters.AddWithValue("cusID", cusID);
+            SqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                customerVehicles.Add(new CustomerVehicles(Convert.ToInt32(reader["vehicleID"]), Convert.ToInt32(reader["cusID"])));
+            }
+            connection.Close();
+            return customerVehicles;
         }
     }
 }

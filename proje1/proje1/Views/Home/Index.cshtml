@@ -3,7 +3,8 @@
 @{
     Layout = null;
     var customer = (Customer)ViewData["customer"];
-    var vehicles = (List<Vehicle>)ViewData["vehicles"];
+    var vehicle1 = (List<Vehicle>)ViewData["vehicle1"];
+    var vehicle2 = (List<Vehicle>)ViewData["vehicle2"];
 }
 
 <!DOCTYPE html>
@@ -12,16 +13,9 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Index</title>
-    <link rel="stylesheet" href="~/Content/map.css">
-    <script>
-        let map;
-        function initMap() {
-            map = new google.maps.Map(document.getElementById("map"), {
-                center: { lat: -34.397, lng: 150.644 },
-                zoom: 8,
-            });
-        };
-    </script>
+    <link rel="stylesheet" href="~/Content/Css/map.css">
+    <link rel="stylesheet" href="~/Content/Css/popup.css" />
+    <link rel="stylesheet" href="~/Content/Css/scrollbar.css" />
 </head>
 <body>
     <div class="container">
@@ -54,15 +48,34 @@
                 <h2>Your Vehicles</h2>
                 <div class="list-element">
                     <div class="row">
-                        Vehicle ID: @vehicles[0].VehicleID
+                        Vehicle ID: @vehicle1[0].Lat
                     </div>
                     <button type="button" id="btn1">Preview</button>
                 </div>
                 <div class="list-element">
                     <div class="row">
-                        Vehicle ID: @vehicles[1].VehicleID
+                        Vehicle ID: @vehicle2[0].Lng
                     </div>
                     <button type="button" id="btn2">Preview</button>
+                </div>
+                <div class="popup" id="popup">
+                    <div class="popup-content">
+                        <h3>Öyle Böyle</h3>
+                        <hr>
+                        <form action="#">
+                            <div class="form-control">
+                                <label>Begin:</label>
+                                <input type="time" name="time" id="time">
+                            </div>
+                            <div class="form-control">
+                                <label>&nbsp;&nbsp;End:&nbsp;</label>
+                                <input type="time" id="time">
+                            </div>
+                            <div class="form-control">
+                                <input type="submit" value="View">
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -72,7 +85,44 @@
         </div>
     </div>
 
-    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap&v=weekly" async></script>
+    <script>
+        var lat = Number(@vehicle1[0].Lat);
+        var lng = Number(@vehicle1[0].Lng);
+        let map;
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: 58.9, lng: 17 },
+            zoom: 10,
+            });
+
+            directionsService = new google.maps.DirectionsService();
+            directionsDisplay = new google.maps.DirectionsRenderer();
+            directionsDisplay.setMap(map);
+            let from = new google.maps.LatLng(lat, lng);
+            let to = new google.maps.LatLng(59.2865719, 18.0936555);
+
+            let request = {
+                origin: from,
+                destination: to,
+                travelMode: google.maps.TravelMode.DRIVING
+            }
+
+            directionsService.route(request, function (response, status) {
+                if (status = 'OK') {
+                    directionsDisplay.setDirections(response);
+                }
+            })
+        };
+
+        function addMarker(proops) {
+            const marker = new google.maps.Marker({
+                position: proops.coords,
+                map: map
+            });
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXWuRsJJ7CWNPT5hseKv_RIry8uH9Jtr0&callback=initMap&v=weekly" async></script>
+
+    <script src="~/Content/Scripts/popup.js"></script>
 </body>
 </html>

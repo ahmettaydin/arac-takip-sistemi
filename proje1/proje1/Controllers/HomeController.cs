@@ -40,11 +40,17 @@ namespace proje1.Controllers
             cusVehicles = GetCustomerVehicles(customer.CusID);
             var vehicle1 = mongoCollection.Find(x => x.ID == cusVehicles[0].VehicleID).ToList();
             var vehicle2 = mongoCollection.Find(x => x.ID == cusVehicles[1].VehicleID).ToList();
+            DateTime date1 = vehicle1[vehicle1.Count-1].Date;
+            date1 = date1.AddMinutes(-30);
+            DateTime date2 = vehicle2[vehicle2.Count - 1].Date;
+            date2 = date2.AddMinutes(-30);
+            var vehicle11 = mongoCollection.Find(x => x.Date >= date1 && x.ID == cusVehicles[0].VehicleID).ToList();
+            var vehicle22 = mongoCollection.Find(x => x.Date >= date2 && x.ID == cusVehicles[1].VehicleID).ToList();
             int visitingID = int.Parse(Request.QueryString["visitingID"]);
             TempData["visitingID"] = visitingID;
             ViewData["customer"] = customer;
-            ViewData["vehicle1"] = vehicle1;
-            ViewData["vehicle2"] = vehicle2;
+            ViewData["vehicle1"] = vehicle11;
+            ViewData["vehicle2"] = vehicle22;
             return View();
         }
 

@@ -12,11 +12,11 @@ namespace proje1.Models
         [BsonId]
         public ObjectId id { get; set; }
         [BsonElement("Date")]
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
         [BsonElement("Lat")]
-        public double Lat { get; set; }
+        public string Lat { get; set; }
         [BsonElement("Lng")]
-        public double Lng { get; set; }
+        public string Lng { get; set; }
         [BsonElement("ID")]
         public int ID { get; set; }
     }

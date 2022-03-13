@@ -48,13 +48,13 @@
                 <h2>Your Vehicles</h2>
                 <div class="list-element">
                     <div class="row">
-                        Vehicle ID: @vehicle1[0].Lat
+                        Vehicle ID: @vehicle1[0].Date
                     </div>
                     <button type="button" id="btn1">Preview</button>
                 </div>
                 <div class="list-element">
                     <div class="row">
-                        Vehicle ID: @vehicle1[vehicle1.Count - 1].Lat
+                        Vehicle ID: @vehicle2[0].ID
                     </div>
                     <button type="button" id="btn2">Preview</button>
                 </div>
@@ -62,19 +62,21 @@
                     <div class="popup-content">
                         <h3>Öyle Böyle</h3>
                         <hr>
-                        <form action="#">
+                        @using (Html.BeginForm("Index", "Home", FormMethod.Post))
+                        {
                             <div class="form-control">
-                                <label>Begin:</label>
-                                <input type="time" name="time" id="time">
-                            </div>
-                            <div class="form-control">
-                                <label>&nbsp;&nbsp;End:&nbsp;</label>
-                                <input type="time" id="time">
+                                <input type="time" name="begin" id="begin">
                             </div>
                             <div class="form-control">
                                 <input type="submit" value="View">
                             </div>
-                        </form>
+                            <div class="id">
+                                <input type="text" id="id" name="id" value="@customer.CusID" />
+                            </div>
+                            <div class="id">
+                                <input type="text" id="vId" name="vId"/>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -86,28 +88,81 @@
     </div>
 
     <script>
+        var vehicle1 = @Html.Raw(Json.Encode(vehicle1));
+        var vehicle2 = @Html.Raw(Json.Encode(vehicle2));
+
         let map;
         function initMap() {
             map = new google.maps.Map(document.getElementById("map"), {
-                center: { lat: 58.9, lng: 17 },
-                zoom: 10,
+                center: { lat: Number(vehicle1[0].Lat), lng: Number(vehicle1[0].Lng) },
+                zoom: 12,
             });
 
-            var directionsService = new google.maps.DirectionsService();
-            var directionsDisplay = new google.maps.DirectionsRenderer();
-            directionsDisplay.setMap(map);
+            var latLngsV1 = [];
+            var latLngsV2 = []
 
-            let request = {
-                origin: new google.maps.LatLng(Number(@vehicle1[0].Lat), Number(@vehicle1[0].Lng)),
-                destination: new google.maps.LatLng(Number(@vehicle1[vehicle1.Count-1].Lat), Number(@vehicle1[vehicle1.Count-1].Lng)),
-                travelMode: google.maps.TravelMode.DRIVING
+            for (let i = 0; i < vehicle1.length; i++) {
+                const newLatLng = new google.maps.LatLng(Number(vehicle1[i].Lat), Number(vehicle1[i].Lng));
+                console.log(vehicle1[0].Lat);
+                const title = "Vehicle Id: " + vehicle1[i].ID + " | Location: " + i;
+                addMarkerV1({ coords: newLatLng }, title);
+                latLngsV1.push(newLatLng);
             }
 
-            directionsService.route(request, function (response, status) {
-                if (status = 'OK') {
-                    directionsDisplay.setDirections(response);
-                }
-            })
+            for (let i = 0; i < vehicle2.length; i++) {
+                const newLatLng = new google.maps.LatLng(Number(vehicle2[i].Lat), Number(vehicle2[i].Lng));
+                console.log(vehicle2[0].Lat);
+                const title = "Vehicle Id: " + vehicle2[i].ID + " | Location: " + i;
+                addMarkerV2({ coords: newLatLng }, title);
+                latLngsV2.push(newLatLng);
+            }
+
+            drawLineV1(latLngsV1);
+            drawLineV2(latLngsV2);
+
+            function addMarkerV1(proops, title) {
+                const marker = new google.maps.Marker({
+                    position: proops.coords,
+                    map: map,
+                    title: title,
+                    icon: {
+                        url: "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
+                    }
+                });
+            }
+
+            function addMarkerV2(proops, title) {
+                const marker = new google.maps.Marker({
+                    position: proops.coords,
+                    map: map,
+                    title: title,
+                    icon: {
+                        url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                    }
+                });
+            }
+
+            function drawLineV1(latlng) {
+                var line = new google.maps.Polyline({
+                    path: latlng,
+                    geodesic: true,
+                    strokeColor: 'red',
+                    strokeOpacity: 1.0,
+                    strokeWeight: 2,
+                });
+                line.setMap(map);
+            }
+
+            function drawLineV2(latlng) {
+                var line = new google.maps.Polyline({
+                    path: latlng,
+                    geodesic: true,
+                    strokeColor: 'blue',
+                    strokeOpacity: 1.0,
+                    strokeWeight: 2,
+                });
+                line.setMap(map);
+            }
         };
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXWuRsJJ7CWNPT5hseKv_RIry8uH9Jtr0&callback=initMap&v=weekly" async></script>

@@ -37,20 +37,71 @@ namespace proje1.Controllers
                 Request.QueryString["cusPsw"],
                 int.Parse(Request.QueryString["suspended"]),
                 int.Parse(Request.QueryString["incorrect"]));
+
             cusVehicles = GetCustomerVehicles(customer.CusID);
+
             var vehicle1 = mongoCollection.Find(x => x.ID == cusVehicles[0].VehicleID).ToList();
             var vehicle2 = mongoCollection.Find(x => x.ID == cusVehicles[1].VehicleID).ToList();
+
             DateTime date1 = vehicle1[vehicle1.Count-1].Date;
             date1 = date1.AddMinutes(-30);
             DateTime date2 = vehicle2[vehicle2.Count - 1].Date;
             date2 = date2.AddMinutes(-30);
+
             var vehicle11 = mongoCollection.Find(x => x.Date >= date1 && x.ID == cusVehicles[0].VehicleID).ToList();
             var vehicle22 = mongoCollection.Find(x => x.Date >= date2 && x.ID == cusVehicles[1].VehicleID).ToList();
+
             int visitingID = int.Parse(Request.QueryString["visitingID"]);
+
             TempData["visitingID"] = visitingID;
             ViewData["customer"] = customer;
             ViewData["vehicle1"] = vehicle11;
             ViewData["vehicle2"] = vehicle22;
+
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Index(TimeSpan begin, int id, int vId)
+        {
+            Customer customer = GetCustomer(id);
+
+            cusVehicles = GetCustomerVehicles(customer.CusID);
+
+            var vehicle1 = mongoCollection.Find(x => x.ID == cusVehicles[0].VehicleID).ToList();
+            var vehicle2 = mongoCollection.Find(x => x.ID == cusVehicles[1].VehicleID).ToList();
+
+            DateTime date1 = vehicle1[vehicle1.Count - 1].Date;
+            date1 = date1.AddMinutes(-30);
+            DateTime date2 = vehicle2[vehicle2.Count - 1].Date;
+            date2 = date2.AddMinutes(-30);
+
+            var vehicle11 = mongoCollection.Find(x => x.Date >= date1 && x.ID == cusVehicles[0].VehicleID).ToList();
+            var vehicle22 = mongoCollection.Find(x => x.Date >= date2 && x.ID == cusVehicles[1].VehicleID).ToList();
+            int visitingID = GetVisitingID();
+
+            if(vId == vehicle1[0].ID)
+            {
+                vehicle11.Clear();
+                DateTime date = vehicle1[vehicle1.Count - 1].Date;
+                date = date.AddMinutes(-begin.Hours);
+                date = date.AddMinutes(-begin.Minutes);
+                vehicle11 = mongoCollection.Find(x => x.ID == vId && x.Date >= date).ToList();
+            }
+            else
+            {
+                vehicle22.Clear();
+                DateTime date = vehicle2[vehicle2.Count - 1].Date;
+                date = date.AddMinutes(-begin.Hours);
+                date = date.AddMinutes(-begin.Minutes);
+                vehicle22 = mongoCollection.Find(x => x.ID == vId && x.Date >= date).ToList();
+            }
+
+            TempData["visitingID"] = visitingID;
+            ViewData["customer"] = customer;
+            ViewData["vehicle1"] = vehicle11;
+            ViewData["vehicle2"] = vehicle22;
+
             return View();
         }
 
@@ -59,6 +110,24 @@ namespace proje1.Controllers
             DateTime now = DateTime.Now;
             UpdateLogout(Convert.ToInt32(TempData["visitingID"]), now);
             return RedirectToAction("Index", "Login");
+        }
+
+        private Customer GetCustomer(int id)
+        {
+            Customer customer = new Customer();
+            connection.Open();
+            string sql = "SELECT * from Customer WHERE cusID = @id";
+            SqlCommand cmd = new SqlCommand(sql, connection);
+            cmd.Parameters.AddWithValue("id", id);
+            SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                customer = new Customer(Convert.ToInt32(reader["cusID"]), reader["cusName"].ToString(), reader["cusLastName"].ToString(), reader["cusEmail"].ToString(), reader["cusPassword"].ToString(), Convert.ToInt32(reader["suspended"]), Convert.ToInt32(reader["incorrect"]));
+            }
+            connection.Close();
+
+            return customer;
         }
 
         private void UpdateLogout(int visitingID, DateTime now)
@@ -86,6 +155,21 @@ namespace proje1.Controllers
             }
             connection.Close();
             return customerVehicles;
+        }
+
+        private int GetVisitingID()
+        {
+            connection.Open();
+            string sql = "SELECT MAX(visitingID) FROM VisitingTime";
+            SqlCommand cmd = new SqlCommand(sql, connection);
+            SqlDataReader reader = cmd.ExecuteReader();
+            int visitingID = -1;
+            while (reader.Read())
+            {
+                visitingID = Convert.ToInt32(reader[0]);
+            }
+            connection.Close();
+            return visitingID;
         }
     }
 }

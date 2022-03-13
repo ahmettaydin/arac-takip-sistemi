@@ -28,6 +28,9 @@ h3 {
 .form-control {
     padding: 4px;
 }
+.d1 {
+    display: none;
+}
 input[type=submit] {
     width: 100%;
     height: 24px;

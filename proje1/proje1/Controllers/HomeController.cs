@@ -27,16 +27,9 @@ namespace proje1.Controllers
         }
 
         // GET: Home
-        public ActionResult Index()
+        public ActionResult Index(Customer cus)   
         {
-            customer = new Customer(
-                int.Parse(Request.QueryString["cusID"]),
-                Request.QueryString["cusName"],
-                Request.QueryString["cusLastName"],
-                Request.QueryString["cusEmail"],
-                Request.QueryString["cusPsw"],
-                int.Parse(Request.QueryString["suspended"]),
-                int.Parse(Request.QueryString["incorrect"]));
+            customer = cus;
 
             cusVehicles = GetCustomerVehicles(customer.CusID);
 
@@ -51,7 +44,7 @@ namespace proje1.Controllers
             var vehicle11 = mongoCollection.Find(x => x.Date >= date1 && x.ID == cusVehicles[0].VehicleID).ToList();
             var vehicle22 = mongoCollection.Find(x => x.Date >= date2 && x.ID == cusVehicles[1].VehicleID).ToList();
 
-            int visitingID = int.Parse(Request.QueryString["visitingID"]);
+            int visitingID = GetVisitingID();
 
             TempData["visitingID"] = visitingID;
             ViewData["customer"] = customer;
@@ -62,45 +55,16 @@ namespace proje1.Controllers
         }
 
         [HttpPost]
-        public ActionResult Index(TimeSpan begin, int id, int vId)
+        public ActionResult Map(TimeSpan begin, int vId)
         {
-            Customer customer = GetCustomer(id);
+            var vehicle = mongoCollection.Find(x => x.ID == vId).ToList();
+            DateTime date = vehicle[vehicle.Count - 1].Date;
+            date = date.AddHours(-begin.Hours);
+            date = date.AddMinutes(-begin.Minutes);
+            vehicle = mongoCollection.Find(x => x.ID == vId && x.Date >= date).ToList();
 
-            cusVehicles = GetCustomerVehicles(customer.CusID);
-
-            var vehicle1 = mongoCollection.Find(x => x.ID == cusVehicles[0].VehicleID).ToList();
-            var vehicle2 = mongoCollection.Find(x => x.ID == cusVehicles[1].VehicleID).ToList();
-
-            DateTime date1 = vehicle1[vehicle1.Count - 1].Date;
-            date1 = date1.AddMinutes(-30);
-            DateTime date2 = vehicle2[vehicle2.Count - 1].Date;
-            date2 = date2.AddMinutes(-30);
-
-            var vehicle11 = mongoCollection.Find(x => x.Date >= date1 && x.ID == cusVehicles[0].VehicleID).ToList();
-            var vehicle22 = mongoCollection.Find(x => x.Date >= date2 && x.ID == cusVehicles[1].VehicleID).ToList();
-            int visitingID = GetVisitingID();
-
-            if(vId == vehicle1[0].ID)
-            {
-                vehicle11.Clear();
-                DateTime date = vehicle1[vehicle1.Count - 1].Date;
-                date = date.AddMinutes(-begin.Hours);
-                date = date.AddMinutes(-begin.Minutes);
-                vehicle11 = mongoCollection.Find(x => x.ID == vId && x.Date >= date).ToList();
-            }
-            else
-            {
-                vehicle22.Clear();
-                DateTime date = vehicle2[vehicle2.Count - 1].Date;
-                date = date.AddMinutes(-begin.Hours);
-                date = date.AddMinutes(-begin.Minutes);
-                vehicle22 = mongoCollection.Find(x => x.ID == vId && x.Date >= date).ToList();
-            }
-
-            TempData["visitingID"] = visitingID;
-            ViewData["customer"] = customer;
-            ViewData["vehicle1"] = vehicle11;
-            ViewData["vehicle2"] = vehicle22;
+            ViewData["vehicle"] = vehicle;
+            ViewBag.Info = vId + " Id'li araca ait " + begin + " saat öncesinden itibaren konumlar gösterilmektedir.";
 
             return View();
         }

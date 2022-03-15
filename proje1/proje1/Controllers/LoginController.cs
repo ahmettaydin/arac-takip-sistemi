@@ -45,17 +45,8 @@ namespace proje1.Controllers
                     now = DateTime.Now;
                     customer = new Customer(u.CusID, u.CusName, u.CusLastName, u.CusEmail, u.CusPassword, u.Suspended, u.Incorrect);
                     InsertLogin(customer.CusID, now);
-                    string url =
-                        string.Format("/home/index?cusID={0}" +
-                        "&cusName={1}" +
-                        "&cusLastName={2}" +
-                        "&cusEmail={3}" +
-                        "&cusPsw={4}" +
-                        "&suspended={5}" +
-                        "&incorrect={6}" +
-                        "&visitingID={7}",
-                        u.CusID,u.CusName,u.CusLastName,u.CusEmail,u.CusPassword,u.Suspended,u.Incorrect,GetVisitingID());
-                    return Redirect(url);
+                  
+                    return RedirectToAction("Index", "Home", customer);
                 }
                 else
                 {

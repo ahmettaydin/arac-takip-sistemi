@@ -169,7 +169,6 @@
     <Content Include="Content\images\logo.png" />
     <Content Include="Content\Css\login.css" />
     <Content Include="Content\Css\map.css" />
-    <Content Include="Content\Scripts\popup.js" />
     <Content Include="Core\Compression\Snappy\lib\win\snappy32.dll" />
     <Content Include="Core\Compression\Snappy\lib\win\snappy64.dll" />
     <Content Include="Core\Compression\Zstandard\lib\win\libzstd.dll" />
@@ -202,6 +201,7 @@
     <None Include="packages.config" />
     <Content Include="Views\Login\Index.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Home\Map.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

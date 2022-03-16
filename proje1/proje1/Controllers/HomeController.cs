@@ -55,16 +55,31 @@ namespace proje1.Controllers
         }
 
         [HttpPost]
-        public ActionResult Map(TimeSpan begin, int vId)
+        public ActionResult Map(TimeSpan begin, TimeSpan end, int vId)
         {
             var vehicle = mongoCollection.Find(x => x.ID == vId).ToList();
-            DateTime date = vehicle[vehicle.Count - 1].Date;
-            date = date.AddHours(-begin.Hours);
-            date = date.AddMinutes(-begin.Minutes);
-            vehicle = mongoCollection.Find(x => x.ID == vId && x.Date >= date).ToList();
+
+            DateTime dateBegin = vehicle[vehicle.Count - 1].Date;
+            DateTime dateEnd = vehicle[vehicle.Count - 1].Date;
+
+            dateBegin = dateBegin.AddHours(-begin.Hours);
+            dateBegin = dateBegin.AddMinutes(-begin.Minutes);
+
+            dateEnd = dateEnd.AddHours(-end.Hours);
+            dateEnd = dateEnd.AddMinutes(-end.Minutes);
+
+            vehicle = mongoCollection.Find(x => x.ID == vId && x.Date >= dateBegin && x.Date <= dateEnd).ToList();
 
             ViewData["vehicle"] = vehicle;
-            ViewBag.Info = vId + " Id'li araca ait " + begin + " saat öncesinden itibaren konumlar gösterilmektedir.";
+            
+            if(begin >= end)
+            {
+                ViewBag.Info = vId + " Id'li araca ait " + begin + " saat öncesinden " + end + " saat öncesine kadar konumlar gösterilmektedir";
+            }
+            else
+            {
+                ViewBag.Info = "Bitiş için girilen zaman (bitiş: " + end + ") başlangıç için girilen zamandan (başlangıç: " + begin + ") büyük olamaz!";
+            }
 
             return View();
         }

@@ -65,13 +65,18 @@
                         @using (Html.BeginForm("Map", "Home", FormMethod.Post, new { target = "_blank" }))
                         {
                             <div class="form-control">
+                                <label>Begin:</label>
                                 <input type="time" name="begin" id="begin">
+                            </div>
+                            <div class="form-control">
+                                <label>&nbsp;&nbsp;End:&nbsp;</label>
+                                <input type="time" name="end" id="end">
                             </div>
                             <div class="form-control">
                                 <input type="submit" value="View">
                             </div>
                             <div class="id">
-                                <input type="text" id="vId" name="vId"/>
+                                <input type="text" id="vId" name="vId" />
                             </div>
                         }
                     </div>
@@ -147,17 +152,23 @@
         var btn1 = document.getElementById("btn1");
         var btn2 = document.getElementById("btn2");
         var vId = document.querySelector('input[name="vId"]');
+        var begin = document.querySelector('input[name="begin"]');
+        var end = document.querySelector('input[name="end"]');
         var h3 = document.getElementById("h3");
 
         btn1.onclick = function () {
             vId.value = @vehicle1[0].ID;
             h3.innerHTML = "<h3>Vehicle Id: @vehicle1[0].ID</h3>";
+            begin.value = "01:00:00";
+            end.value = "00:00:00";
             popup.style.display = "block";
         }
 
         btn2.onclick = function () {
             vId.value = @vehicle2[0].ID;
             h3.innerHTML = "<h3>Vehicle Id: @vehicle2[0].ID</h3>";
+            begin.value = "01:00:00";
+            end.value = "00:00:00";
             popup.style.display = "block";
         }
 

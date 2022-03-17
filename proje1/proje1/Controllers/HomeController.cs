@@ -74,11 +74,12 @@ namespace proje1.Controllers
             
             if(begin >= end)
             {
-                ViewBag.Info = vId + " Id'li araca ait " + begin + " saat öncesinden " + end + " saat öncesine kadar konumlar gösterilmektedir";
+                ViewBag.Info = "The positions of the vehicle with an id of " + vId + 
+                    " from " + begin + " hours ago to " + end + " hours ago.";
             }
             else
             {
-                ViewBag.Info = "Bitiş için girilen zaman (bitiş: " + end + ") başlangıç için girilen zamandan (başlangıç: " + begin + ") büyük olamaz!";
+                ViewBag.Info = "Begin value (" + begin + ") cannot be less than end value (" + end + ")!";
             }
 
             return View();

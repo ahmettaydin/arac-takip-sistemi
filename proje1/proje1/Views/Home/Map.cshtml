@@ -21,21 +21,29 @@
         let map;
 
         function initMap() {
-            map = new google.maps.Map(document.getElementById("map"), {
-                center: { lat: Number(vehicle[0].Lat), lng: Number(vehicle[0].Lng) },
-                zoom: 12,
-            });
 
             var latLngs = [];
 
-            for (let i = 0; i < vehicle.length; i++) {
-                const newLatLng = new google.maps.LatLng(Number(vehicle[i].Lat), Number(vehicle[i].Lng));
-                const title = "Vehicle Id: " + vehicle[i].ID + " | Location: " + i;
-                addMarker({ coords: newLatLng }, title);
-                latLngs.push(newLatLng);
-            }
+            if (vehicle.length > 0) {
+                map = new google.maps.Map(document.getElementById("map"), {
+                    center: { lat: Number(vehicle[0].Lat), lng: Number(vehicle[0].Lng) },
+                    zoom: 12,
+                });
 
-            drawLine(latLngs);
+                for (let i = 0; i < vehicle.length; i++) {
+                    const newLatLng = new google.maps.LatLng(Number(vehicle[i].Lat), Number(vehicle[i].Lng));
+                    const title = "Vehicle Id: " + vehicle[i].ID + " | Location: " + i;
+                    addMarker({ coords: newLatLng }, title);
+                    latLngs.push(newLatLng);
+                }
+
+                drawLine(latLngs);
+            } else {
+                map = new google.maps.Map(document.getElementById("map"), {
+                    center: { lat: 59.34777828444246, lng: 18.057839340988682 },
+                    zoom: 12,
+                });
+            }
 
             function addMarker(proops, title) {
                 const marker = new google.maps.Marker({

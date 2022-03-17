@@ -51,6 +51,7 @@ namespace proje1.Controllers
                 else
                 {
                     ViewBag.LoginError = "Your account has been suspended.";
+                    customers.Clear();
                     return View();
                 }  
             }
@@ -116,21 +117,6 @@ namespace proje1.Controllers
             cmd.Parameters.AddWithValue("now", now);
             cmd.ExecuteNonQuery();
             connection.Close();
-        }
-
-        private int GetVisitingID()
-        {
-            connection.Open();
-            string sql = "SELECT MAX(visitingID) FROM VisitingTime";
-            SqlCommand cmd = new SqlCommand(sql, connection);
-            SqlDataReader reader = cmd.ExecuteReader();
-            int visitingID = -1;
-            while(reader.Read())
-            {
-                visitingID = Convert.ToInt32(reader[0]);
-            }
-            connection.Close();
-            return visitingID;
         }
     }
 }
